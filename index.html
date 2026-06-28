@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Daily Brief">
+<meta name="theme-color" content="#0a0a0a">
+<title>Pavan's Daily Brief</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface2: #1e1e1e;
+  --border: #2a2a2a;
+  --text: #f0f0f0;
+  --text2: #a0a0a0;
+  --accent: #3b82f6;
+  --ai: #8b5cf6;
+  --chip: #ef4444;
+  --world: #22c55e;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+}
+
+header {
+  background: rgba(10,10,10,0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 0;
+}
+
+.logo { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+.logo span { color: var(--accent); }
+.date-label { font-size: 11px; color: var(--text2); font-weight: 500; }
+
+.tabs {
+  display: flex;
+  padding: 10px 16px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  flex: 1;
+  min-width: 90px;
+  padding: 8px 10px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--text2);
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-align: center;
+}
+.tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+main {
+  padding: 0 12px 80px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.panel { display: none; padding-top: 14px; }
+.panel.active { display: block; }
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.refresh-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.refresh-btn:disabled { opacity: 0.4; cursor: default; }
+.refresh-btn:active { opacity: 0.7; }
+
+.news-grid { display: flex; flex-direction: column; gap: 8px; }
+
+a.card {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.1s;
+}
+a.card:active { background: var(--surface2); }
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.tag {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 2px 7px;
+  border-radius: 8px;
+}
+.tag-ai { background: rgba(139,92,246,0.18); color: var(--ai); }
+.tag-hardware, .tag-chips { background: rgba(239,68,68,0.18); color: var(--chip); }
+.tag-world, .tag-geopolitics, .tag-conflict, .tag-policy {
+  background: rgba(34,197,94,0.18); color: var(--world);
+}
+.tag-market { background: rgba(59,130,246,0.18); color: var(--accent); }
+
+.card-source { font-size: 10px; color: var(--text2); font-weight: 500; }
+.card-date { font-size: 10px; color: var(--text2); margin-left: auto; }
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 5px;
+  color: var(--text);
+}
+
+.card-desc {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text2);
+  font-size: 13px;
+}
+
+.spinner {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-msg {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: #f87171;
+  font-size: 13px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">⚡ <span>Daily</span> Brief</div>
+    <div class="date-label" id="dateLabel"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('ai')">🤖 AI & Models</button>
+    <button class="tab" onclick="switchTab('chips')">🔬 Hardware</button>
+    <button class="tab" onclick="switchTab('world')">🌍 World</button>
+  </div>
+</header>
+
+<main>
+  <div id="panel-ai" class="panel active">
+    <div class="status-bar">
+      <span id="ai-ts"></span>
+      <button class="refresh-btn" id="btn-ai" onclick="loadTab('ai',true)">↻ Refresh</button>
+    </div>
+    <div id="feed-ai" class="news-grid"><div class="loading"><span class="spinner"></span>Loading AI news…</div></div>
+  </div>
+
+  <div id="panel-chips" class="panel">
+    <div class="status-bar">
+      <span id="chips-ts"></span>
+      <button class="refresh-btn" id="btn-chips" onclick="loadTab('chips',true)">↻ Refresh</button>
+    </div>
+    <div id="feed-chips" class="news-grid"></div>
+  </div>
+
+  <div id="panel-world" class="panel">
+    <div class="status-bar">
+      <span id="world-ts"></span>
+      <button class="refresh-btn" id="btn-world" onclick="loadTab('world',true)">↻ Refresh</button>
+    </div>
+    <div id="feed-world" class="news-grid"></div>
+  </div>
+</main>
+
+<script>
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json?count=10&rss_url=';
+const CACHE_TTL = 30 * 60 * 1000;
+
+const FEEDS = {
+  ai: [
+    { url: 'https://techcrunch.com/category/artificial-intelligence/feed/', label: 'TechCrunch', tag: 'AI' },
+    { url: 'https://venturebeat.com/category/ai/feed/', label: 'VentureBeat', tag: 'AI' },
+    { url: 'https://www.theverge.com/ai-artificial-intelligence/rss/index.xml', label: 'The Verge', tag: 'AI' },
+  ],
+  chips: [
+    { url: 'https://feeds.arstechnica.com/arstechnica/technology-lab', label: 'Ars Technica', tag: 'Hardware' },
+    { url: 'https://www.tomshardware.com/feeds/all', label: "Tom's Hardware", tag: 'Chips' },
+    { url: 'https://techcrunch.com/category/hardware/feed/', label: 'TechCrunch', tag: 'Hardware' },
+  ],
+  world: [
+    { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', label: 'BBC', tag: 'World' },
+    { url: 'https://feeds.reuters.com/reuters/topNews', label: 'Reuters', tag: 'World' },
+    { url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', label: 'NYT', tag: 'Geopolitics' },
+  ]
+};
+
+const loaded = {};
+
+document.getElementById('dateLabel').textContent =
+  new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t, i) =>
+    t.classList.toggle('active', ['ai','chips','world'][i] === id));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (!loaded[id]) loadTab(id);
+}
+
+async function loadTab(id, force = false) {
+  const feedEl = document.getElementById('feed-' + id);
+  const btn = document.getElementById('btn-' + id);
+
+  if (!force) {
+    const cached = getCache(id);
+    if (cached) { render(id, cached.items); setTs(id, cached.ts); loaded[id] = true; return; }
+  }
+
+  feedEl.innerHTML = '<div class="loading"><span class="spinner"></span>Fetching…</div>';
+  btn.disabled = true;
+
+  const all = [];
+  await Promise.allSettled(FEEDS[id].map(async src => {
+    try {
+      const r = await fetch(RSS2JSON + encodeURIComponent(src.url));
+      if (!r.ok) return;
+      const d = await r.json();
+      if (d.status !== 'ok') return;
+      for (const item of (d.items || []).slice(0, 6)) {
+        all.push({
+          title: item.title || '',
+          desc: strip(item.description || item.content || ''),
+          url: item.link || '',
+          source: src.label,
+          tag: src.tag,
+          date: item.pubDate ? new Date(item.pubDate) : new Date(),
+        });
+      }
+    } catch {}
+  }));
+
+  btn.disabled = false;
+
+  if (!all.length) {
+    feedEl.innerHTML = '<div class="error-msg">⚠️ Could not load feeds. Check your connection and refresh.</div>';
+    return;
+  }
+
+  all.sort((a, b) => b.date - a.date);
+  const seen = new Set();
+  const items = all.filter(i => {
+    const k = i.title.slice(0, 50);
+    if (seen.has(k)) return false;
+    seen.add(k); return true;
+  }).slice(0, 20);
+
+  const ts = Date.now();
+  setCache(id, { items, ts });
+  setTs(id, ts);
+  render(id, items);
+  loaded[id] = true;
+}
+
+function render(id, items) {
+  document.getElementById('feed-' + id).innerHTML = items.map(item => {
+    const tagCls = 'tag-' + item.tag.toLowerCase();
+    const ago = relTime(new Date(item.date));
+    return `<a class="card" href="${esc(item.url)}" target="_blank" rel="noopener">
+      <div class="card-meta">
+        <span class="tag ${tagCls}">${esc(item.tag)}</span>
+        <span class="card-source">${esc(item.source)}</span>
+        <span class="card-date">${ago}</span>
+      </div>
+      <div class="card-title">${esc(item.title)}</div>
+      ${item.desc ? `<div class="card-desc">${esc(item.desc.slice(0,220))}</div>` : ''}
+    </a>`;
+  }).join('');
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function strip(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  return (d.textContent||'').replace(/\s+/g,' ').trim();
+}
+
+function relTime(d) {
+  const m = Math.round((Date.now()-d)/60000);
+  if (m < 60) return m+'m ago';
+  const h = Math.round(m/60);
+  if (h < 24) return h+'h ago';
+  return Math.round(h/24)+'d ago';
+}
+
+function setTs(id, ts) {
+  const el = document.getElementById(id+'-ts');
+  if (!el) return;
+  el.textContent = 'Updated ' + new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+
+function getCache(id) {
+  try {
+    const d = JSON.parse(localStorage.getItem('brief_'+id));
+    return d && Date.now()-d.ts < CACHE_TTL ? d : null;
+  } catch { return null; }
+}
+
+function setCache(id, d) {
+  try { localStorage.setItem('brief_'+id, JSON.stringify(d)); } catch {}
+}
+
+loadTab('ai');
+</script>
+</body>
+</html>

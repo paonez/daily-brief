@@ -22,6 +22,8 @@
   --ai: #8b5cf6;
   --chip: #ef4444;
   --world: #22c55e;
+  --xblue: #1d9bf0;
+  --gold: #f59e0b;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -33,8 +35,9 @@ body {
   min-height: 100dvh;
 }
 
+/* ── Header ── */
 header {
-  background: rgba(10,10,10,0.9);
+  background: rgba(10,10,10,0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
@@ -48,25 +51,25 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px 0;
+  padding: 12px 16px 0;
 }
 
-.logo { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+.logo { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
 .logo span { color: var(--accent); }
 .date-label { font-size: 11px; color: var(--text2); font-weight: 500; }
 
 .tabs {
   display: flex;
-  padding: 10px 16px 0;
+  padding: 8px 16px 0;
   overflow-x: auto;
   scrollbar-width: none;
+  gap: 4px;
 }
 .tabs::-webkit-scrollbar { display: none; }
 
 .tab {
-  flex: 1;
-  min-width: 90px;
-  padding: 8px 10px 10px;
+  flex-shrink: 0;
+  padding: 7px 12px 9px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -76,28 +79,23 @@ header {
   border-bottom: 2px solid transparent;
   transition: all 0.15s;
   white-space: nowrap;
-  text-align: center;
 }
 .tab.active { color: var(--text); border-bottom-color: var(--accent); }
 
-main {
-  padding: 0 12px 80px;
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.panel { display: none; padding-top: 14px; }
+/* ── Main ── */
+main { padding: 0 12px 80px; max-width: 700px; margin: 0 auto; }
+.panel { display: none; padding-top: 12px; }
 .panel.active { display: block; }
 
+/* ── Status bar ── */
 .status-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   font-size: 11px;
   color: var(--text2);
 }
-
 .refresh-btn {
   background: var(--accent);
   color: white;
@@ -109,14 +107,14 @@ main {
   cursor: pointer;
 }
 .refresh-btn:disabled { opacity: 0.4; cursor: default; }
-.refresh-btn:active { opacity: 0.7; }
 
+/* ── News cards ── */
 .news-grid { display: flex; flex-direction: column; gap: 8px; }
 
 a.card {
   background: var(--surface);
   border-radius: 14px;
-  padding: 14px;
+  padding: 13px;
   border: 1px solid var(--border);
   display: block;
   text-decoration: none;
@@ -125,76 +123,131 @@ a.card {
 }
 a.card:active { background: var(--surface2); }
 
-.card-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 7px;
-}
-
+.card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .tag {
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  padding: 2px 7px;
-  border-radius: 8px;
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.6px; padding: 2px 7px; border-radius: 8px;
 }
 .tag-ai { background: rgba(139,92,246,0.18); color: var(--ai); }
 .tag-hardware, .tag-chips { background: rgba(239,68,68,0.18); color: var(--chip); }
-.tag-world, .tag-geopolitics, .tag-conflict, .tag-policy {
-  background: rgba(34,197,94,0.18); color: var(--world);
-}
-.tag-market { background: rgba(59,130,246,0.18); color: var(--accent); }
+.tag-world, .tag-geopolitics, .tag-conflict, .tag-policy { background: rgba(34,197,94,0.18); color: var(--world); }
+.tag-market, .tag-finance, .tag-india { background: rgba(245,158,11,0.18); color: var(--gold); }
 
 .card-source { font-size: 10px; color: var(--text2); font-weight: 500; }
 .card-date { font-size: 10px; color: var(--text2); margin-left: auto; }
-
-.card-title {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
-  margin-bottom: 5px;
-  color: var(--text);
+.card-title { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 5px; }
+.card-desc {
+  font-size: 12px; color: var(--text2); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 
-.card-desc {
-  font-size: 12px;
-  color: var(--text2);
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+/* ── Loading / Error ── */
+.loading { text-align: center; padding: 40px 20px; color: var(--text2); font-size: 13px; }
+.spinner {
+  display: block; width: 26px; height: 26px;
+  border: 2px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 10px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-msg {
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 12px; padding: 18px; text-align: center; color: #f87171; font-size: 13px;
+}
+
+/* ── X Feeds tab ── */
+.x-cat-bar {
+  display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none;
+}
+.x-cat-bar::-webkit-scrollbar { display: none; }
+
+.x-cat-btn {
+  flex-shrink: 0; padding: 5px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text2); transition: all 0.15s;
+}
+.x-cat-btn.active { background: var(--xblue); border-color: var(--xblue); color: white; }
+
+.x-accounts { display: flex; flex-direction: column; gap: 10px; }
+
+.x-account-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
   overflow: hidden;
 }
 
-.loading {
-  text-align: center;
-  padding: 50px 20px;
-  color: var(--text2);
-  font-size: 13px;
+.x-account-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px 8px;
 }
 
-.spinner {
-  display: block;
-  width: 28px;
-  height: 28px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  margin: 0 auto 12px;
+.x-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--surface2); display: flex; align-items: center;
+  justify-content: center; font-size: 16px; flex-shrink: 0;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
 
-.error-msg {
-  background: rgba(239,68,68,0.1);
-  border: 1px solid rgba(239,68,68,0.2);
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  color: #f87171;
-  font-size: 13px;
+.x-name { font-size: 13px; font-weight: 600; }
+.x-handle { font-size: 11px; color: var(--text2); }
+
+.x-link {
+  margin-left: auto; font-size: 11px; color: var(--xblue);
+  text-decoration: none; font-weight: 600; white-space: nowrap;
+}
+
+.x-embed-wrap {
+  padding: 0 10px 10px;
+  min-height: 200px;
+}
+
+/* Force X embed to fit our dark theme */
+.x-embed-wrap iframe { border-radius: 10px !important; }
+
+/* ── Markets tab ── */
+.market-section { margin-bottom: 14px; }
+
+.section-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.6px; color: var(--text2); margin-bottom: 8px; padding-left: 2px;
+}
+
+.tv-widget-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+}
+
+.market-sub-tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+}
+.market-sub-tab {
+  flex: 1; padding: 8px; font-size: 11px; font-weight: 600; text-align: center;
+  cursor: pointer; border: none; background: none; color: var(--text2); transition: all 0.15s;
+}
+.market-sub-tab.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+
+.market-panel { display: none; }
+.market-panel.active { display: block; }
+
+.indices-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px;
+}
+
+.index-card {
+  background: var(--surface2); border-radius: 10px; padding: 10px 12px;
+  border: 1px solid var(--border);
+}
+
+.index-name { font-size: 10px; color: var(--text2); font-weight: 600; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+.index-val { font-size: 15px; font-weight: 700; }
+.index-chg { font-size: 11px; font-weight: 600; margin-top: 2px; }
+.up { color: #22c55e; }
+.down { color: #ef4444; }
+.index-loading { font-size: 11px; color: var(--text2); }
+
+/* Ticker tape */
+.ticker-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden; margin-bottom: 14px;
 }
 </style>
 </head>
@@ -206,13 +259,17 @@ a.card:active { background: var(--surface2); }
     <div class="date-label" id="dateLabel"></div>
   </div>
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('ai')">🤖 AI & Models</button>
+    <button class="tab active" onclick="switchTab('ai')">🤖 AI</button>
     <button class="tab" onclick="switchTab('chips')">🔬 Hardware</button>
     <button class="tab" onclick="switchTab('world')">🌍 World</button>
+    <button class="tab" onclick="switchTab('x')">𝕏 Feeds</button>
+    <button class="tab" onclick="switchTab('markets')">📈 Markets</button>
   </div>
 </header>
 
 <main>
+
+  <!-- ── AI ── -->
   <div id="panel-ai" class="panel active">
     <div class="status-bar">
       <span id="ai-ts"></span>
@@ -221,6 +278,7 @@ a.card:active { background: var(--surface2); }
     <div id="feed-ai" class="news-grid"><div class="loading"><span class="spinner"></span>Loading AI news…</div></div>
   </div>
 
+  <!-- ── Hardware ── -->
   <div id="panel-chips" class="panel">
     <div class="status-bar">
       <span id="chips-ts"></span>
@@ -229,6 +287,7 @@ a.card:active { background: var(--surface2); }
     <div id="feed-chips" class="news-grid"></div>
   </div>
 
+  <!-- ── World ── -->
   <div id="panel-world" class="panel">
     <div class="status-bar">
       <span id="world-ts"></span>
@@ -236,9 +295,264 @@ a.card:active { background: var(--surface2); }
     </div>
     <div id="feed-world" class="news-grid"></div>
   </div>
+
+  <!-- ── X Feeds ── -->
+  <div id="panel-x" class="panel">
+    <div class="x-cat-bar">
+      <button class="x-cat-btn active" onclick="switchXCat('ai')">🤖 AI & Tech</button>
+      <button class="x-cat-btn" onclick="switchXCat('news')">📰 News</button>
+      <button class="x-cat-btn" onclick="switchXCat('finance')">📈 Finance</button>
+    </div>
+
+    <!-- AI accounts -->
+    <div class="x-accounts" id="xcat-ai">
+      <div class="x-account-block">
+        <div class="x-account-header">
+          <div class="x-avatar">🤖</div>
+          <div><div class="x-name">OpenAI</div><div class="x-handle">@OpenAI</div></div>
+          <a class="x-link" href="https://x.com/OpenAI" target="_blank">Open ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline" data-theme="dark" data-tweet-limit="4" data-chrome="noheader nofooter noborders" href="https://twitter.com/OpenAI">Tweets by OpenAI</a>
+        </div>
+      </div>
+      <div class="x-account-block">
+        <div class="x-account-header">
+          <div class="x-avatar">🧠</div>
+          <div><div class="x-name">Anthropic</div><div class="x-handle">@AnthropicAI</div></div>
+          <a class="x-link" href="https://x.com/AnthropicAI" target="_blank">Open ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline" data-theme="dark" data-tweet-limit="4" data-chrome="noheader nofooter noborders" href="https://twitter.com/AnthropicAI">Tweets by Anthropic</a>
+        </div>
+      </div>
+      <div class="x-account-block">
+        <div class="x-account-header">
+          <div class="x-avatar">⚡</div>
+          <div><div class="x-name">NVIDIA</div><div class="x-handle">@nvidia</div></div>
+          <a class="x-link" href="https://x.com/nvidia" target="_blank">Open ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline" data-theme="dark" data-tweet-limit="4" data-chrome="noheader nofooter noborders" href="https://twitter.com/nvidia">Tweets by NVIDIA</a>
+        </div>
+      </div>
+      <div class="x-account-block">
+        <div class="x-account-header">
+          <div class="x-avatar">🔵</div>
+          <div><div class="x-name">Google DeepMind</div><div class="x-handle">@GoogleDeepMind</div></div>
+          <a class="x-link" href="https://x.com/GoogleDeepMind" target="_blank">Open ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline" data-theme="dark" data-tweet-limit="4" data-chrome="noheader nofooter noborders" href="https://twitter.com/GoogleDeepMind">Tweets by Google DeepMind</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- News accounts -->
+    <div class="x-accounts" id="xcat-news" style="display:none">
+      <div class="x-account-block">
+        <div class="x-account-header">
+          <div class="x-avatar">📡</div>
+          <div><div class="x-name">Reuters</div><div class="x-handle">@Reuters</div></div>
+          <a class="x-link" href="https://x.com/Reuters" target="_blank">Open ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline" data-theme="dark" data-tweet-limit="4" data-chrome="noheader nofooter noborders" href="https://twitter.com/Reuters">Tweets by Reuters</a>
+        </div>
+      </div>
+      <div class="x-account-block">
+        <div class="x-account-header">
+          <div class="x-avatar">🌐</div>
+          <div><div class="x-name">BBC Breaking News</div><div class="x-handle">@BBCBreaking</div></div>
+          <a class="x-link" href="https://x.com/BBCBreaking" target="_blank">Open ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline" data-theme="dark" data-tweet-limit="4" data-chrome="noheader nofooter noborders" href="https://twitter.com/BBCBreaking">Tweets by BBC Breaking News</a>
+        </div>
+      </div>
+      <div class="x-account-block">
+        <div class="x-account-header">
+          <div class="x-avatar">📰</div>
+          <div><div class="x-name">Associated Press</div><div class="x-handle">@AP</div></div>
+          <a class="x-link" href="https://x.com/AP" target="_blank">Open ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline" data-theme="dark" data-tweet-limit="4" data-chrome="noheader nofooter noborders" href="https://twitter.com/AP">Tweets by AP</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Finance accounts -->
+    <div class="x-accounts" id="xcat-finance" style="display:none">
+      <div class="x-account-block">
+        <div class="x-account-header">
+          <div class="x-avatar">🇮🇳</div>
+          <div><div class="x-name">NSE India</div><div class="x-handle">@NSEIndia</div></div>
+          <a class="x-link" href="https://x.com/NSEIndia" target="_blank">Open ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline" data-theme="dark" data-tweet-limit="4" data-chrome="noheader nofooter noborders" href="https://twitter.com/NSEIndia">Tweets by NSE India</a>
+        </div>
+      </div>
+      <div class="x-account-block">
+        <div class="x-account-header">
+          <div class="x-avatar">📊</div>
+          <div><div class="x-name">ET Markets</div><div class="x-handle">@ETMarkets</div></div>
+          <a class="x-link" href="https://x.com/ETMarkets" target="_blank">Open ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline" data-theme="dark" data-tweet-limit="4" data-chrome="noheader nofooter noborders" href="https://twitter.com/ETMarkets">Tweets by ET Markets</a>
+        </div>
+      </div>
+      <div class="x-account-block">
+        <div class="x-account-header">
+          <div class="x-avatar">💹</div>
+          <div><div class="x-name">Bloomberg Markets</div><div class="x-handle">@markets</div></div>
+          <a class="x-link" href="https://x.com/markets" target="_blank">Open ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline" data-theme="dark" data-tweet-limit="4" data-chrome="noheader nofooter noborders" href="https://twitter.com/markets">Tweets by Bloomberg Markets</a>
+        </div>
+      </div>
+      <div class="x-account-block">
+        <div class="x-account-header">
+          <div class="x-avatar">🏦</div>
+          <div><div class="x-name">Reserve Bank of India</div><div class="x-handle">@RBI</div></div>
+          <a class="x-link" href="https://x.com/RBI" target="_blank">Open ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline" data-theme="dark" data-tweet-limit="4" data-chrome="noheader nofooter noborders" href="https://twitter.com/RBI">Tweets by RBI</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Markets ── -->
+  <div id="panel-markets" class="panel">
+
+    <!-- Live Ticker Tape -->
+    <div class="ticker-wrap">
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+        {
+          "symbols": [
+            {"proName": "NSE:NIFTY", "title": "NIFTY 50"},
+            {"proName": "BSE:SENSEX", "title": "SENSEX"},
+            {"proName": "NSE:BANKNIFTY", "title": "BANK NIFTY"},
+            {"proName": "NSE:RELIANCE", "title": "Reliance"},
+            {"proName": "NSE:INFY", "title": "Infosys"},
+            {"proName": "NSE:TCS", "title": "TCS"},
+            {"proName": "FOREXCOM:SPXUSD", "title": "S&P 500"},
+            {"proName": "FOREXCOM:NSXUSD", "title": "NASDAQ 100"},
+            {"proName": "FX:USDINR", "title": "USD/INR"},
+            {"proName": "BINANCE:BTCUSDT", "title": "Bitcoin"}
+          ],
+          "showSymbolLogo": true,
+          "isTransparent": true,
+          "displayMode": "adaptive",
+          "colorTheme": "dark",
+          "locale": "en"
+        }
+        </script>
+      </div>
+    </div>
+
+    <!-- Market Overview Widget -->
+    <div class="market-section">
+      <div class="section-label">Markets Overview</div>
+      <div class="tv-widget-wrap">
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+          {
+            "colorTheme": "dark",
+            "dateRange": "1D",
+            "showChart": true,
+            "locale": "en",
+            "isTransparent": true,
+            "showSymbolLogo": false,
+            "showFloatingTooltip": false,
+            "width": "100%",
+            "height": "510",
+            "tabs": [
+              {
+                "title": "🇮🇳 India",
+                "symbols": [
+                  {"s": "NSE:NIFTY", "d": "NIFTY 50"},
+                  {"s": "BSE:SENSEX", "d": "SENSEX"},
+                  {"s": "NSE:BANKNIFTY", "d": "BANK NIFTY"},
+                  {"s": "NSE:CNXMIDCAP", "d": "NIFTY MIDCAP"},
+                  {"s": "NSE:RELIANCE", "d": "Reliance"},
+                  {"s": "NSE:INFY", "d": "Infosys"},
+                  {"s": "NSE:TCS", "d": "TCS"},
+                  {"s": "NSE:HDFCBANK", "d": "HDFC Bank"},
+                  {"s": "NSE:ICICIBANK", "d": "ICICI Bank"},
+                  {"s": "NSE:WIPRO", "d": "Wipro"}
+                ],
+                "originalTitle": "India"
+              },
+              {
+                "title": "🌍 Global",
+                "symbols": [
+                  {"s": "FOREXCOM:SPXUSD", "d": "S&P 500"},
+                  {"s": "FOREXCOM:NSXUSD", "d": "NASDAQ 100"},
+                  {"s": "INDEX:DJI", "d": "Dow Jones"},
+                  {"s": "INDEX:NI225", "d": "Nikkei 225"},
+                  {"s": "INDEX:HSI", "d": "Hang Seng"},
+                  {"s": "INDEX:DEU40", "d": "DAX"},
+                  {"s": "INDEX:UKX", "d": "FTSE 100"}
+                ],
+                "originalTitle": "Global"
+              },
+              {
+                "title": "💱 Forex",
+                "symbols": [
+                  {"s": "FX:USDINR", "d": "USD/INR"},
+                  {"s": "FX:EURINR", "d": "EUR/INR"},
+                  {"s": "FX:GBPINR", "d": "GBP/INR"},
+                  {"s": "FX:EURUSD", "d": "EUR/USD"},
+                  {"s": "FX:GBPUSD", "d": "GBP/USD"},
+                  {"s": "FX:USDJPY", "d": "USD/JPY"}
+                ],
+                "originalTitle": "Forex"
+              },
+              {
+                "title": "₿ Crypto",
+                "symbols": [
+                  {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
+                  {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
+                  {"s": "BINANCE:SOLUSDT", "d": "Solana"},
+                  {"s": "BINANCE:BNBUSDT", "d": "BNB"}
+                ],
+                "originalTitle": "Crypto"
+              }
+            ]
+          }
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <!-- Market News RSS -->
+    <div class="market-section">
+      <div class="section-label">Market News</div>
+      <div class="status-bar" style="margin-top:-4px">
+        <span id="markets-ts"></span>
+        <button class="refresh-btn" id="btn-markets" onclick="loadTab('markets',true)">↻ Refresh</button>
+      </div>
+      <div id="feed-markets" class="news-grid"><div class="loading"><span class="spinner"></span>Loading market news…</div></div>
+    </div>
+
+  </div>
+
 </main>
 
+<!-- X Widget Script (loaded once) -->
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
 <script>
+// ── Config ────────────────────────────────────────────────────────────────────
 const RSS2JSON = 'https://api.rss2json.com/v1/api.json?count=10&rss_url=';
 const CACHE_TTL = 30 * 60 * 1000;
 
@@ -257,25 +571,51 @@ const FEEDS = {
     { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', label: 'BBC', tag: 'World' },
     { url: 'https://feeds.reuters.com/reuters/topNews', label: 'Reuters', tag: 'World' },
     { url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', label: 'NYT', tag: 'Geopolitics' },
+  ],
+  markets: [
+    { url: 'https://economictimes.indiatimes.com/markets/rss.cms', label: 'ET Markets', tag: 'India' },
+    { url: 'https://www.moneycontrol.com/rss/latestnews.xml', label: 'MoneyControl', tag: 'India' },
+    { url: 'https://feeds.reuters.com/reuters/businessNews', label: 'Reuters Biz', tag: 'Finance' },
+    { url: 'https://feeds.bbci.co.uk/news/business/rss.xml', label: 'BBC Business', tag: 'Finance' },
   ]
 };
 
 const loaded = {};
 
+// ── Init ──────────────────────────────────────────────────────────────────────
 document.getElementById('dateLabel').textContent =
-  new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  new Date().toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
 
+// ── Tab switching ─────────────────────────────────────────────────────────────
 function switchTab(id) {
-  document.querySelectorAll('.tab').forEach((t, i) =>
-    t.classList.toggle('active', ['ai','chips','world'][i] === id));
+  const ids = ['ai', 'chips', 'world', 'x', 'markets'];
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ids[i] === id));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
-  if (!loaded[id]) loadTab(id);
+
+  // Lazy load RSS tabs
+  if (['ai','chips','world','markets'].includes(id) && !loaded[id]) loadTab(id);
+
+  // Trigger TradingView widget resize if needed
+  if (id === 'markets') window.dispatchEvent(new Event('resize'));
 }
 
+// ── X category switching ──────────────────────────────────────────────────────
+function switchXCat(cat) {
+  document.querySelectorAll('.x-cat-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  ['ai','news','finance'].forEach(c => {
+    document.getElementById('xcat-' + c).style.display = c === cat ? 'flex' : 'none';
+  });
+  // Re-trigger Twitter widget rendering for newly visible embeds
+  if (window.twttr && window.twttr.widgets) window.twttr.widgets.load();
+}
+
+// ── RSS loading ───────────────────────────────────────────────────────────────
 async function loadTab(id, force = false) {
   const feedEl = document.getElementById('feed-' + id);
   const btn = document.getElementById('btn-' + id);
+  if (!feedEl) return;
 
   if (!force) {
     const cached = getCache(id);
@@ -283,7 +623,7 @@ async function loadTab(id, force = false) {
   }
 
   feedEl.innerHTML = '<div class="loading"><span class="spinner"></span>Fetching…</div>';
-  btn.disabled = true;
+  if (btn) btn.disabled = true;
 
   const all = [];
   await Promise.allSettled(FEEDS[id].map(async src => {
@@ -305,10 +645,10 @@ async function loadTab(id, force = false) {
     } catch {}
   }));
 
-  btn.disabled = false;
+  if (btn) btn.disabled = false;
 
   if (!all.length) {
-    feedEl.innerHTML = '<div class="error-msg">⚠️ Could not load feeds. Check your connection and refresh.</div>';
+    feedEl.innerHTML = '<div class="error-msg">⚠️ Could not load feeds. Try refreshing.</div>';
     return;
   }
 
@@ -318,7 +658,7 @@ async function loadTab(id, force = false) {
     const k = i.title.slice(0, 50);
     if (seen.has(k)) return false;
     seen.add(k); return true;
-  }).slice(0, 20);
+  }).slice(0, 22);
 
   const ts = Date.now();
   setCache(id, { items, ts });
@@ -330,12 +670,11 @@ async function loadTab(id, force = false) {
 function render(id, items) {
   document.getElementById('feed-' + id).innerHTML = items.map(item => {
     const tagCls = 'tag-' + item.tag.toLowerCase();
-    const ago = relTime(new Date(item.date));
     return `<a class="card" href="${esc(item.url)}" target="_blank" rel="noopener">
       <div class="card-meta">
         <span class="tag ${tagCls}">${esc(item.tag)}</span>
         <span class="card-source">${esc(item.source)}</span>
-        <span class="card-date">${ago}</span>
+        <span class="card-date">${relTime(new Date(item.date))}</span>
       </div>
       <div class="card-title">${esc(item.title)}</div>
       ${item.desc ? `<div class="card-desc">${esc(item.desc.slice(0,220))}</div>` : ''}
@@ -343,16 +682,15 @@ function render(id, items) {
   }).join('');
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
 function strip(html) {
   const d = document.createElement('div');
   d.innerHTML = html;
   return (d.textContent||'').replace(/\s+/g,' ').trim();
 }
-
 function relTime(d) {
   const m = Math.round((Date.now()-d)/60000);
   if (m < 60) return m+'m ago';
@@ -360,24 +698,22 @@ function relTime(d) {
   if (h < 24) return h+'h ago';
   return Math.round(h/24)+'d ago';
 }
-
 function setTs(id, ts) {
   const el = document.getElementById(id+'-ts');
   if (!el) return;
-  el.textContent = 'Updated ' + new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  el.textContent = 'Updated ' + new Date(ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
 }
-
 function getCache(id) {
   try {
     const d = JSON.parse(localStorage.getItem('brief_'+id));
     return d && Date.now()-d.ts < CACHE_TTL ? d : null;
   } catch { return null; }
 }
-
 function setCache(id, d) {
   try { localStorage.setItem('brief_'+id, JSON.stringify(d)); } catch {}
 }
 
+// ── Boot ──────────────────────────────────────────────────────────────────────
 loadTab('ai');
 </script>
 </body>
